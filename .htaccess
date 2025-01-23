@@ -1,0 +1,12 @@
+RewriteEngine on
+
+# Condição: Se a URL não corresponder a um diretório
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Condição: Se a URL não corresponder a um arquivo
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Regra: Redireciona para index.php
+RewriteRule ^ index.php [L]
+
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
