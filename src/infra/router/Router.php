@@ -44,8 +44,6 @@ class Router
         if (empty($controllerAttributes)) {
             throw new Exception('Controlador não possui o atributo necessário: Controller.', HttpStatus::NOT_FOUND->value);
         }
-        $classAttributes = $refClass->getAttributes(RequestMapping::class);
-        $basePath = !empty($classAttributes) ? $classAttributes[0]->newInstance()->basePath : '';
 
         $httpMethod = $_SERVER['REQUEST_METHOD'];
 

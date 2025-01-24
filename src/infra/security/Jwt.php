@@ -22,7 +22,7 @@ class JWT
         return "$header.$payload.$signature";
     }
 
-    public static function decode($token)
+    private static function decode($token)
     {
         $parts = explode('.', $token);
         if (count($parts) !== 3) {
