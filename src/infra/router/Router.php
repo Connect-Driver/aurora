@@ -40,11 +40,6 @@ class Router
 
         $refClass = new ReflectionClass($controller);
 
-        $controllerAttributes = $refClass->getAttributes(Controller::class);
-        if (empty($controllerAttributes)) {
-            throw new Exception('Controlador não possui o atributo necessário: Controller.', HttpStatus::NOT_FOUND->value);
-        }
-
         $httpMethod = $_SERVER['REQUEST_METHOD'];
 
         foreach ($refClass->getMethods() as $method) {
