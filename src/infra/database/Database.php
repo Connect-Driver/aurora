@@ -11,10 +11,10 @@ class Database
     private $lastQuery;
     private $lastParams;
     
-    public function __construct($host = 'localhost', $dbname = 'u474089460_connectmobile', $username = 'u474089460_patrik', $password = 'C0nn3ct@Mob1l&')
+    public function __construct($host = DB_HOST, $dbname = DB_NAME, $name = DB_NAME, $password = DB_PASS)
     {
         try {
-            $this->pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+            $this->pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $name, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Error connecting to database: " . $e->getMessage());

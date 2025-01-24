@@ -6,20 +6,17 @@ use Exception;
 
 use infra\http\HttpStatus;
 
-class JWT //talvez mudar para uma lib especifica em jwt
+class JWT
 {
-    private static $secretKey = ''; // Environment variable
-    private static $algo = 'HS256';
-
-    public static function encode(array $payload, $expiration = 3600)
+    public static function encode(array $payload)
     {
-        $header = json_encode(['typ' => 'JWT', 'alg' => self::$algo]);
-        $payload['exp'] = time() + $expiration;
+        $header = json_encode(['typ' => 'JWT', 'alg' => JWT_ALGORITHM]);
+        $payload['exp'] = time() + JWT_EXPIRATION;
 
         $header = self::base64UrlEncode($header);
         $payload = self::base64UrlEncode(json_encode($payload));
 
-        $signature = hash_hmac('sha256', "$header.$payload", self::$secretKey, true);
+        $signature = hash_hmac('sha256', "$header.$payload", JWT_SECRET, true);
         $signature = self::base64UrlEncode($signature);
 
         return "$header.$payload.$signature";
@@ -41,7 +38,7 @@ class JWT //talvez mudar para uma lib especifica em jwt
             return false;
         }
 
-        $validSignature = hash_hmac('sha256', "$parts[0].$parts[1]", self::$secretKey, true);
+        $validSignature = hash_hmac('sha256', "$parts[0].$parts[1]", JWT_SECRET, true);
         $validSignature = self::base64UrlEncode($validSignature);
 
         if (!hash_equals($validSignature, $signature)) {
