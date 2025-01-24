@@ -22,7 +22,7 @@ use infra\annotations\RequestHeader;
 
 class Router
 {
-    public function start(): Response|string|null
+    public function start(): Response|string|array|null
     {
         return $this->processUrl();
     }

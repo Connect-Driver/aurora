@@ -17,6 +17,6 @@ class PingController
     #[GetMapping]
     public function ping()
     {
-        return 'pong';
+        return ['nome' => 'pong'];
     }
 }
