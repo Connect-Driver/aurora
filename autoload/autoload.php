@@ -7,5 +7,7 @@ spl_autoload_register(function (string $className) {
 
     if (file_exists($filePath)) {
         require $filePath;
+    } else {
+        die("Erro: Arquivo da classe '$className' não encontrado em '$filePath'");
     }
 });

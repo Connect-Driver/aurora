@@ -1,4 +1,10 @@
 <?php
+
+namespace infra\database;
+
+use PDO;
+use PDOException;
+
 class Database
 {
     private $pdo;

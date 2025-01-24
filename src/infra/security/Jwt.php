@@ -1,5 +1,11 @@
 <?php
 
+namespace infra\security;
+
+use Exception;
+
+use infra\http\HttpStatus;
+
 class JWT //talvez mudar para uma lib especifica em jwt
 {
     private static $secretKey = ''; // Environment variable

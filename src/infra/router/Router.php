@@ -24,11 +24,6 @@ class Router
 {
     public function start(): Response|string|null
     {
-        return $this->handleRequest();
-    }
-
-    private function handleRequest(): Response|string|null
-    {
         return $this->processUrl();
     }
 
@@ -38,6 +33,10 @@ class Router
         $requestData = explode("/", trim($uri, '/'));
 
         $controller = $this->getControllerByRequestMapping($requestData[0]);
+
+        if (!$controller) {
+            throw new Exception('Controlador não encontrado.', HttpStatus::NOT_FOUND->value);
+        }
 
         $refClass = new ReflectionClass($controller);
 
@@ -119,56 +118,36 @@ class Router
         return null;
     }
 
-    private function getController($controllerName)
-    {
-        $controllerFile = 'app/domain/controller/' . $controllerName . '.php';
-
-        if (file_exists($controllerFile)) { //refatorar, para, caso nao tenha a annotation requestmapping na classe, ai ele busque pelo nome da classe, mas caso tenha, busque pelo nome do controller
-            include_once $controllerFile;
-            $formattedController = ucfirst($controllerName) . 'Controller'; //PascalCase
-
-            if (class_exists($formattedController)) {
-                $refClass = new ReflectionClass($formattedController);
-                $controllerAttributes = $refClass->getAttributes(Controller::class);
-
-                if (empty($controllerAttributes)) {
-                    throw new Exception('O controlador `' . $formattedController . '` não possui o atributo Controller.', HttpStatus::NOT_FOUND->value);
-                }
-
-                return new $formattedController();
-            } else {
-                throw new Exception('Controlador `' . $formattedController . '` não encontrado.', HttpStatus::NOT_FOUND->value); //depois deixar apenas essa
-            }
-        } else {
-            throw new Exception('Arquivo do controlador `' . $controllerFile . '` não encontrado.', HttpStatus::NOT_FOUND->value); //apenas para ajudar no debug
-        }
-    }
-
     private function getControllerByRequestMapping($firstSegment)
     {
-        $controllers = glob('app/domain/controller/*.php');
-
-        foreach ($controllers as $controllerFile) {
-            include_once $controllerFile;
-            $controllerClass = basename($controllerFile, '.php');
-            $controllerClass = ucfirst($controllerClass) . 'Controller';
-            $refClass = new ReflectionClass($controllerClass);
-
-            $controllerAttributes = $refClass->getAttributes(Controller::class);
-            if (empty($controllerAttributes)) {
-                continue;
-            }
-
-            $attributes = $refClass->getAttributes(RequestMapping::class);
-            if (!empty($attributes)) {
-                $basePath = $attributes[0]->newInstance()->basePath;
-                if (trim($basePath, '/') === $firstSegment) {
-                    return $refClass->newInstance();
+        try {
+            $controllers = glob(__DIR__ . '/../../app/api/controller/*.php');
+            
+            foreach ($controllers as $controllerFile) {
+                include_once $controllerFile;
+                $controllerClass = basename($controllerFile, '.php');
+                $controllerClass = 'app\api\controller\\' . ucfirst($controllerClass);
+                $refClass = new ReflectionClass($controllerClass);
+    
+                $controllerAttributes = $refClass->getAttributes(Controller::class);
+                if (empty($controllerAttributes)) {
+                    continue;
+                }
+    
+                $attributes = $refClass->getAttributes(RequestMapping::class);
+                if (!empty($attributes)) {
+                    $basePath = $attributes[0]->newInstance()->basePath;
+                    if (trim($basePath, '/') === $firstSegment) {
+                        return $refClass->newInstance();
+                    }
                 }
             }
+    
+            return null;
         }
-
-        return $this->getController($firstSegment);
+        catch(Exception $e) {
+            throw new Exception($e->getMessage(), HttpStatus::BAD_REQUEST->value);
+        }
     }
 
     private function matchPath($fullPath, $requestData, &$matches)
