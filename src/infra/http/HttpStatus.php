@@ -1,5 +1,7 @@
 <?php
 
+namespace infra\http;
+
 enum HttpStatus: int
 {
     case OK = 200;

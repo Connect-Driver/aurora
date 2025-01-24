@@ -1,5 +1,9 @@
 <?php
 
+namespace infra\annotations;
+
+use infra\http\HttpStatus;
+
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Controller
 {
